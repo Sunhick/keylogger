@@ -10,7 +10,7 @@ UI view will create a server window for key logger
 __author__ = "Sunil"
 __copyright__ = "Copyleft 2015, keylogger Project"
 __license__ = "GPL 3.0"
-__version__ = "1.0.0"
+__version__ = "0.0.0"
 __email__ = "sunhick@gmail.com"
 
 
@@ -27,9 +27,19 @@ class ServerWindow(Gtk.Window):
         self._log.debug('Gtk window init')
         Gtk.Window.__init__(self, title = 'Key logger')
 
-        self.button = Gtk.Button(label = 'Quit')
-        self.button.connect('clicked', self.on_button_clicked)
-        self.add(self.button)
+        self._grid = Gtk.Grid()
+        self.add(self._grid)
 
-    def on_button_clicked(self, widget):
-        self._log.info('button clicked')
+        self._start_button = Gtk.Button(label="Start")
+        self._start_button.connect("clicked", self.start_listening)
+        self._grid.add(self._start_button)
+
+        self._stop_button = Gtk.Button(label="Stop")
+        self._stop_button.connect("clicked", self.stop_listening)
+        self._grid.add(self._stop_button)
+
+    def start_listening(self, widget):
+        self._log.info('Starting listening to the key logger clients')
+
+    def stop_listening(self, widget):
+        self._log.info('Stop listening to the key logger clients')

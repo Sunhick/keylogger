@@ -11,7 +11,7 @@ will hook to the server socket and send the key strokes.
 __author__ = "Sunil"
 __copyright__ = "Copyleft 2015, keylogger Project"
 __license__ = "GPL 3.0"
-__version__ = "1.0.0"
+__version__ = "0.0.0"
 __email__ = "sunhick@gmail.com"
 
 
@@ -38,6 +38,9 @@ def main(*argv):
 
     log.debug('Hooking delete-event to Gtk quit')
     win.connect('delete-event', Gtk.main_quit)
+
+    log.debug('starting root window in maximized state')
+    win.maximize()
     win.show_all()
     Gtk.main()
 
