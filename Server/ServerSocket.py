@@ -1,10 +1,11 @@
 import sys
 import logging
 import thread
-from socket import *
+import socket
 
 
-BUFFER = 10  # read 10 chars at a time
+BUFFER = 50  # read 10 chars at a time
+BACKLOG = 5  # allow upto 5 clients at a time to connect to server
 
 class ServerSocket(object):
     def __init__(self):
@@ -20,25 +21,26 @@ class ServerSocket(object):
         self._log.info('starting up on %s port %s' % (server_address))
         self._sock.bind(server_address)
         # Listen for incoming connections
-        self._sock.listen(1)
+        self._sock.listen(BACKLOG)
 
-        while _server_up:
+        while self._server_up:
             # Wait for a connection
             self._log.debug('waiting for a connection')
-            connection, client_address = sock.accept()
+            connection, client_address = self._sock.accept()
+            self._log.debug('connection from {addr}'.format(addr=client_address))
             try:
-                self._log.info('connection from {0}' % (client_address))
                 clienthandler = thread.start_new_thread(self.handler, (connection, client_address))
                 self._threads.append(client_address)
             except Exception, exp:
-                self._log.error(e, exc_info = True)
-
+                self._log.error('Exception occured during starting thread')
+                self._log.exception(exp)
 
     def stop(self):
         self._log.info('stop server socket listen')
         self._server_up = False
 
     def handler(self, clientsock, addr):
+        self._log.info('reading data from client {addr}'.format(addr=addr))
         while True:
             data = clientsock.recv(BUFFER)
             self._log.info('Data:' + repr(data))

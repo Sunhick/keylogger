@@ -32,7 +32,17 @@ logging.config.fileConfig('%s/logging.conf' % basepath)
 log = logging.getLogger(__name__)
 
 
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+
+    log.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+
 def main(*argv):
+    # catch global unhandled exceptions
+    sys.excepthook = handle_exception
+    
     log.debug('Creating Gtk window')
     win = ServerWindow()
 
