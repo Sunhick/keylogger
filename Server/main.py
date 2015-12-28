@@ -46,6 +46,7 @@ def main(*argv):
     
     app = ServerWindow()
     win = app.get_top_level_window()
+    win.set_icon_from_file('images/keylogger.png')
     win.show_all()
     Gtk.main()
 
