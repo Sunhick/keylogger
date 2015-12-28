@@ -20,27 +20,25 @@ from ServerSocket import ServerSocket
 from gi.repository import Gtk
 
 
-class ServerWindow(Gtk.Window):
+class ServerWindow:
     """
     Server UI window for key logger
     """    
     def __init__(self):
         self._log = logging.getLogger(__name__)
         self._log.debug('Gtk window init')
-        Gtk.Window.__init__(self, title = 'Key logger')
-
-        self._grid = Gtk.Grid()
-        self.add(self._grid)
-
-        self._start_button = Gtk.Button(label="Start")
-        self._start_button.connect("clicked", self.start_listening)
-        self._grid.add(self._start_button)
-
-        self._stop_button = Gtk.Button(label="Stop")
-        self._stop_button.connect("clicked", self.stop_listening)
-        self._grid.add(self._stop_button)
-
+        self._builder = Gtk.Builder()
+        self._builder.add_from_file("ui.glade")
+        self._builder.connect_signals(self)
+        self.set_window_size()
         self._server_sock = ServerSocket()
+
+    def on_app_exit(self, *args):
+        self._log.debug('Quitting key logger app')
+        Gtk.main_quit(*args)        
+
+    def get_top_level_window(self):
+        return self._builder.get_object("server_window")
 
     def start_listening(self, widget):
         self._log.info('Starting listening to the key logger clients')
@@ -49,3 +47,27 @@ class ServerWindow(Gtk.Window):
     def stop_listening(self, widget):
         self._log.info('Stop listening to the key logger clients')
         thread.start_new_thread(self._server_sock.stop, ())
+
+    def set_window_size(self):
+        window = self.get_top_level_window()
+        screen = window.get_screen()
+
+        # collect data about each monitor
+        monitors = []
+        nmons = screen.get_n_monitors()
+        self._log.info('There are %d monitors' % (nmons))
+        
+        for m in range(nmons):
+            mg = screen.get_monitor_geometry(m)
+            self._log.info('Monitor %d: %d x %d' % (m, mg.width, mg.height))
+            monitors.append(mg)
+
+        # current monitor
+        curmon = screen.get_monitor_at_window(screen.get_active_window())
+        width, height = monitors[curmon].width, monitors[curmon].height
+        self._log.info('Monitor %d: %d x %d (current)' % (curmon, width, height))
+
+        ww = 3*width/4
+        wh = 3*height/4
+
+        window.set_size_request(ww, wh)

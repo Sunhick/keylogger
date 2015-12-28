@@ -39,18 +39,13 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
     log.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
+
 def main(*argv):
     # catch global unhandled exceptions
     sys.excepthook = handle_exception
     
-    log.debug('Creating Gtk window')
-    win = ServerWindow()
-
-    log.debug('Hooking delete-event to Gtk quit')
-    win.connect('delete-event', Gtk.main_quit)
-
-    log.debug('starting root window in maximized state')
-    win.maximize()
+    app = ServerWindow()
+    win = app.get_top_level_window()
     win.show_all()
     Gtk.main()
 

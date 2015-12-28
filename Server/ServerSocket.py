@@ -29,7 +29,8 @@ class ServerSocket(object):
             connection, client_address = self._sock.accept()
             self._log.debug('connection from {addr}'.format(addr=client_address))
             try:
-                clienthandler = thread.start_new_thread(self.handler, (connection, client_address))
+                clienthandler = thread.start_new_thread(self.handler,
+                                                        (connection, client_address))
                 self._threads.append(client_address)
             except Exception, exp:
                 self._log.error('Exception occured during starting thread')
