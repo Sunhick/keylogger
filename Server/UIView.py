@@ -18,7 +18,20 @@ import logging
 import thread
 from ServerSocket import ServerSocket
 from gi.repository import Gtk
+from gi.repository import Pango
 
+
+columns = ['Time stamp',
+           'User Name',
+           'Application Id',
+           'Key Stroke']
+
+keylogs = [['Dec 22, 12:50PM', 'Sunil', 'Skype', 'ALT+K'],
+           ['Dec 22, 12:50PM', 'Sunil', 'Skype', 'P'],
+           ['Dec 22, 12:50PM', 'Sunil', 'Skype', 'ALT+K'],
+           ['Dec 22, 12:50PM', 'Sunil', 'Skype', 'P'],
+           ['Dec 22, 12:50PM', 'Sunil', 'Skype', 'ALT+K'],
+           ['Dec 22, 12:50PM', 'Sunil', 'Skype', 'P']]
 
 class ServerWindow:
     """
@@ -27,16 +40,56 @@ class ServerWindow:
     def __init__(self):
         self._log = logging.getLogger(__name__)
         self._log.debug('Gtk window init')
-        self._texts = ''
 
         self._builder = Gtk.Builder()
         self._builder.add_from_file('ui.glade')
         self._builder.connect_signals(self)
         self._mainwindow = self._builder.get_object('server_window')
-        self._textview = self._builder.get_object('text_view')
-        
-        self.set_window_size()
+
+        self._set_window_size()
+        self._set_icons()
+        self._setup_keylog_view()
         self._server_sock = ServerSocket()
+
+
+    def _setup_keylog_view(self):
+        # the data in the model (three strings for each row, one for each
+        # column)
+        listmodel = Gtk.ListStore(str, str, str, str)
+        # append the values in the model
+        for i in range(len(keylogs)):
+            listmodel.append(keylogs[i])
+
+        # a treeview to see the data stored in the model
+        view = Gtk.TreeView(model=listmodel)  # self._builder.get_object('keylog_view')
+        # for each column
+        for i in range(len(columns)):
+            # cellrenderer to render the text
+            cell = Gtk.CellRendererText()
+            # the text in the first column should be in boldface
+            if i == 0:
+                cell.props.weight_set = True
+                # the column is created
+            col = Gtk.TreeViewColumn(columns[i], cell, text=i)
+            # and it is appended to the treeview
+            view.append_column(col)
+
+        scrolledwin = self._builder.get_object('scrolledwindow')
+        scrolledwin.add(view)
+
+    def _set_icons(self):
+        self._set_resource('refresh_img', 'images/refresh.png')
+        self._set_resource('delete_img', 'images/delete.png')
+        self._set_resource('info_img', 'images/info.png')
+        self._set_resource('hide_img', 'images/hide.png')
+        self._set_resource('about_img', 'images/about.png')
+        self._set_resource('stop_img', 'images/stop.png')
+        self._set_resource('start_img', 'images/start.png')
+
+    def _set_resource(self, objid, resource):
+        uiobj = self._builder.get_object(objid)
+        uiobj.set_from_file(resource)
+
 
     def on_app_exit(self, *args):
         self._log.debug('Quitting key logger app')
@@ -45,20 +98,15 @@ class ServerWindow:
     def get_top_level_window(self):
         return self._mainwindow
 
-    def _callback(self, data):
-        textbuffer = self._textview.get_buffer()
-        self._texts += data
-        textbuffer.set_text(self._texts)
-
     def start_listening(self, widget):
         self._log.info('Starting listening to the key logger clients')
-        thread.start_new_thread(self._server_sock.start, (self._callback,))
+        # thread.start_new_thread(self._server_sock.start, (self._callback,))
 
     def stop_listening(self, widget):
         self._log.info('Stop listening to the key logger clients')
-        thread.start_new_thread(self._server_sock.stop, ())
+        # thread.start_new_thread(self._server_sock.stop, ())
 
-    def set_window_size(self):
+    def _set_window_size(self):
         window = self.get_top_level_window()
         screen = window.get_screen()
 

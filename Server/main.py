@@ -27,7 +27,6 @@ from gi.repository import Gtk
 # set up the logging
 print('Setting up logging module...')
 basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
-print basepath
 logging.config.fileConfig('%s/logging.conf' % basepath)
 log = logging.getLogger(__name__)
 
