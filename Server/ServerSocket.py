@@ -3,8 +3,11 @@ import logging
 import thread
 import socket
 
+from threading import current_thread
+from gi.repository import GObject
 
-BUFFER = 50  # read 10 chars at a time
+
+BUFFER = 500  # read 10 chars at a time
 BACKLOG = 5  # allow upto 5 clients at a time to connect to server
 
 class ServerSocket(object):
@@ -50,8 +53,11 @@ class ServerSocket(object):
         self._log.info('reading data from client {addr}'.format(addr=addr))
         while self._server_up:
             data = clientsock.recv(BUFFER)
-            self._log.info('Data:' + repr(data))
-            callback(repr(data))
+            self._log.info('Data:' + str(data))
+            
+            self._log.info('Gobject idle_add called from thread id: {threadid}'.format(threadid=current_thread()))
+            # callback(repr(data))
+            GObject.idle_add(callback, str(data))
             
             if not data:
                 break
