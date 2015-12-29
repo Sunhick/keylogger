@@ -1,0 +1,4 @@
+1. Fix server socket
+2. Run server socket in different thread
+3. Dispatch ui update from server thread to main thread using GObject
+4. Fix all logging

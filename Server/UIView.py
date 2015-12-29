@@ -42,7 +42,7 @@ class ServerWindow:
         self._log.debug('Gtk window init')
 
         self._builder = Gtk.Builder()
-        self._builder.add_from_file('ui.glade')
+        self._builder.add_from_file('gui/main_ui.glade')
         self._builder.connect_signals(self)
         self._mainwindow = self._builder.get_object('server_window')
 
@@ -52,16 +52,20 @@ class ServerWindow:
         self._server_sock = ServerSocket()
 
 
+    # ---------------------- Internal methods ------------------------
+
     def _setup_keylog_view(self):
         # the data in the model (three strings for each row, one for each
         # column)
-        listmodel = Gtk.ListStore(str, str, str, str)
+        self._listmodel = Gtk.ListStore(str, str, str, str)
         # append the values in the model
         for i in range(len(keylogs)):
-            listmodel.append(keylogs[i])
+            self._listmodel.append(keylogs[i])
 
         # a treeview to see the data stored in the model
-        view = Gtk.TreeView(model=listmodel)  # self._builder.get_object('keylog_view')
+        view = Gtk.TreeView(model = self._listmodel)  # self._builder.get_object('keylog_view')
+        # view.set_grid_lines(True)
+
         # for each column
         for i in range(len(columns)):
             # cellrenderer to render the text
@@ -71,6 +75,7 @@ class ServerWindow:
                 cell.props.weight_set = True
                 # the column is created
             col = Gtk.TreeViewColumn(columns[i], cell, text=i)
+            col.set_resizable(True)
             # and it is appended to the treeview
             view.append_column(col)
 
@@ -89,22 +94,6 @@ class ServerWindow:
     def _set_resource(self, objid, resource):
         uiobj = self._builder.get_object(objid)
         uiobj.set_from_file(resource)
-
-
-    def on_app_exit(self, *args):
-        self._log.debug('Quitting key logger app')
-        Gtk.main_quit(*args)        
-
-    def get_top_level_window(self):
-        return self._mainwindow
-
-    def start_listening(self, widget):
-        self._log.info('Starting listening to the key logger clients')
-        # thread.start_new_thread(self._server_sock.start, (self._callback,))
-
-    def stop_listening(self, widget):
-        self._log.info('Stop listening to the key logger clients')
-        # thread.start_new_thread(self._server_sock.stop, ())
 
     def _set_window_size(self):
         window = self.get_top_level_window()
@@ -129,3 +118,47 @@ class ServerWindow:
         wh = 3*height/4
 
         window.set_size_request(ww, wh)
+
+
+    # ------------------- Public methods ------------------------------
+    
+    def get_top_level_window(self):
+        return self._mainwindow
+
+    # -------------------- Signal handlers -----------------------------
+    
+    def on_app_exit(self, *args):
+        self._log.info('Quitting key logger app')
+        Gtk.main_quit(*args)
+
+    def start_listening(self, widget):
+        self._log.debug('Clicked on Stop button')
+        self._log.info('Starting listening to the key logger clients')
+        # thread.start_new_thread(self._server_sock.start, (self._callback,))
+
+    def stop_listening(self, widget):
+        self._log.debug('Clicked on Start button')
+        self._log.info('Stop listening to the key logger clients')
+        # thread.start_new_thread(self._server_sock.stop, ())
+
+    def aboutus(self, widget):
+        self._log.debug('Clicked on About us button')
+        builder = Gtk.Builder()
+        builder.add_from_file('gui/about.glade')
+        about_dialog = builder.get_object('about_dialog')
+        about_dialog.set_transient_for(self._mainwindow)
+        
+        about_dialog.run()
+
+
+    def information(self, widget):
+        self._log.debug('Clicked on Information button')
+
+    def hide(self, widget):
+        self._log.debug('Clicked on hide button')
+
+    def delete_log(self, widget):
+        self._log.debug('Clicked on delete logs button')
+
+    def refresh(self, widget):
+        self._log.debug('Clicked on refresh button')
