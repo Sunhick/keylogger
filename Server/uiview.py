@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-UIView.py
+uiview.py
 
-UI self._view will create a server window for key logger
+Ui view  will create a server window for key logger
 """
 
 __author__ = "Sunil"
@@ -17,7 +17,7 @@ __email__ = "sunhick@gmail.com"
 import logging
 import thread
 
-from ServerSocket import ServerSocket
+from tcpsocket import ServerSocket
 from gi.repository import Gtk
 from gi.repository import Pango
 from threading import current_thread
@@ -25,7 +25,7 @@ from threading import current_thread
 keylog_header = ['Time stamp',
                  'User Name',
                  'Application Id',
-                 'Key Stroke']
+                 'Key Strokes']
 
 class ServerWindow:
     """

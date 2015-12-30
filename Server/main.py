@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Server.py
+main.py
 
 Server implementation of the keylogger. All the clients 
 will hook to the server socket and send the key strokes.
@@ -20,7 +20,7 @@ import logging
 import os
 import logging.config
 
-from UIView import ServerWindow
+from uiview import ServerWindow
 from gi.repository import Gtk
 
 

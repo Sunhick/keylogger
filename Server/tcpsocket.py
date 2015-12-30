@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-ServerSocket.py
+tcpsocket.py
 
 Server Socket implementation. This file is reponsible 
 for creating socket and listening for incoming clients.
