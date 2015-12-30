@@ -1,3 +1,23 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+"""
+ServerSocket.py
+
+Server Socket implementation. This file is reponsible 
+for creating socket and listening for incoming clients.
+
+Read the clients key logger data and dispatch it to UI thread
+for updating the ui
+"""
+
+__author__ = "Sunil"
+__copyright__ = "Copyleft 2015, keylogger Project"
+__license__ = "GPL 3.0"
+__version__ = "0.0.0"
+__email__ = "sunhick@gmail.com"
+
+
 import sys
 import logging
 import thread

@@ -23,9 +23,9 @@ from gi.repository import Pango
 from threading import current_thread
 
 keylog_header = ['Time stamp',
-           'User Name',
-           'Application Id',
-           'Key Stroke']
+                 'User Name',
+                 'Application Id',
+                 'Key Stroke']
 
 class ServerWindow:
     """

@@ -1,4 +1,10 @@
-1. Fix server socket
-2. Run server socket in different thread
-3. Dispatch ui update from server thread to main thread using GObject
+1. Fix server socket -- Partial
+   * Signaling or Condition for monitoring
+   * Stop Handle client
+   * use threading and not deprecated thread
+   
+2. Run server socket in different thread -- Done
+
+3. Dispatch ui update from server thread to main thread using GObject -- Done
+
 4. Fix all logging
