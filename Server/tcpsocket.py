@@ -65,7 +65,7 @@ class TcpSocket(object):
         self._log.info('Binding to {adapter} with IP address = {ip}'
                        .format(adapter = self._adapter, ip=ipaddr))
         # Bind the socket to the port
-        server_address = (ipaddr, 9999)
+        server_address = (ipaddr, self._port)
         self._log.info('starting up on %s port %s' % (server_address))
         self._sock.bind(server_address)
         
@@ -102,7 +102,7 @@ class TcpSocket(object):
             # callback(repr(data))
             GObject.idle_add(callback, str(data))
             
-            if not data:
-                break
+            #if not data:
+            #    break
 
         clientsock.close()
