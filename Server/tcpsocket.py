@@ -60,6 +60,7 @@ class TcpSocket(object):
         
         # Create a TCP/IP socket
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         ipaddr = self._get_adapter_ip(self._adapter)
         self._log.info('Binding to {adapter} with IP address = {ip}'
@@ -102,7 +103,9 @@ class TcpSocket(object):
             # callback(repr(data))
             GObject.idle_add(callback, str(data))
             
-            #if not data:
-            #    break
+            # client will send empty string on the shutdown.
+            # Shutdown the listening port as well for this thread.
+            if not data:
+                break
 
         clientsock.close()
