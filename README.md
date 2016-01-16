@@ -1,6 +1,8 @@
 # keylogger
 key logger for hacking 
 
+[![Build Status](https://travis-ci.org/Sunhick/keylogger.svg?branch=travis)](https://travis-ci.org/Sunhick/keylogger)
+
 
 Server UI:
 
