@@ -5,6 +5,8 @@
 
 build:
 
+test:
+
 .PHONY: clean
 clean:
 	-rm Server/*.pyc Server/*~
